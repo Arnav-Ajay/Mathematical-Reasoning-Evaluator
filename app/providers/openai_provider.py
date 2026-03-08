@@ -1,9 +1,13 @@
+# app/providers/openai_provider.py
 from __future__ import annotations
-
 import os
-from typing import Optional
 
-from .base import MathProvider, ProviderResponse
+try:
+    from app.core.config import DEFAULT_OPENAI_MODELS, OPENAI_SYSTEM_PROMPT
+except ModuleNotFoundError:
+    from app.core.config import DEFAULT_OPENAI_MODELS, OPENAI_SYSTEM_PROMPT
+
+from app.providers.base import MathProvider, ProviderResponse
 
 
 class OpenAIProvider(MathProvider):
@@ -25,13 +29,16 @@ class OpenAIProvider(MathProvider):
 
     @staticmethod
     def default_models() -> list[str]:
-        # Safe default small models suitable for PoC math
-        return [
-            "gpt-4o-mini",
-            "o4-mini",
-        ]
+        return list(DEFAULT_OPENAI_MODELS)
 
-    def generate(self, *, model: str, prompt: str) -> ProviderResponse:
+    def generate(
+        self,
+        *,
+        model: str,
+        prompt: str,
+        system_prompt: str | None = None,
+        temperature: float = 0,
+    ) -> ProviderResponse:
         if not self.available():
             return ProviderResponse(model=model, output="", error="OpenAI not available")
 
@@ -41,17 +48,14 @@ class OpenAIProvider(MathProvider):
                 messages=[
                     {
                         "role": "system",
-                        "content": (
-                            "You are a precise math solver. Return only the final"
-                            " SymPy-compatible expression or equation. No prose."
-                        ),
+                        "content": system_prompt or OPENAI_SYSTEM_PROMPT,
                     },
                     {
                         "role": "user",
                         "content": prompt,
                     },
                 ],
-                temperature=0,
+                temperature=temperature,
             )
             content = resp.choices[0].message.content.strip()
             # Strip code fences if the model used them
@@ -60,4 +64,3 @@ class OpenAIProvider(MathProvider):
             return ProviderResponse(model=model, output=content)
         except Exception as e:
             return ProviderResponse(model=model, output="", error=str(e))
-

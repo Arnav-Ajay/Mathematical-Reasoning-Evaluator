@@ -1,3 +1,4 @@
+# app/providers/base.py
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -19,6 +20,12 @@ class MathProvider:
     def available(self) -> bool:
         return False
 
-    def generate(self, *, model: str, prompt: str) -> ProviderResponse:
+    def generate(
+        self,
+        *,
+        model: str,
+        prompt: str,
+        system_prompt: str | None = None,
+        temperature: float = 0,
+    ) -> ProviderResponse:
         raise NotImplementedError
-
