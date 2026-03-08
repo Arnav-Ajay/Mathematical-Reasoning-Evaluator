@@ -25,9 +25,9 @@ from app.providers import OpenAIProvider
 
 load_dotenv(override=True)
 
-st.set_page_config(page_title="Math Reasoning Evaluator", layout="wide")
+st.set_page_config(page_title="Maths Answer Evaluator", layout="wide")
 
-st.title("Mathematical Reasoning Evaluator")
+st.title("Mathematical Answer Evaluator")
 st.caption("Symbolically verifies LLM math answers using SymPy.")
 
 

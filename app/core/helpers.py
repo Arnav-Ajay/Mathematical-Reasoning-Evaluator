@@ -13,7 +13,7 @@ def normalize_response(raw: str) -> ResponseSchema:
     if text.startswith("```"):
         text = text.strip("`").strip()
 
-    reasoning: Optional[str] = None
+    meta_note: Optional[str] = None
     if text.startswith("{") and text.endswith("}"):
         try:
             payload = json.loads(text)
@@ -21,9 +21,12 @@ def normalize_response(raw: str) -> ResponseSchema:
                 maybe_answer = payload.get("ai_response") or payload.get("answer") or payload.get("response")
                 if maybe_answer is not None:
                     text = str(maybe_answer).strip()
-                maybe_reasoning = payload.get("reasoning")
-                if maybe_reasoning is not None:
-                    reasoning = str(maybe_reasoning).strip() or None
+                # Backward-compatible capture for optional extra note fields.
+                maybe_note = payload.get("meta_note")
+                if maybe_note is None:
+                    maybe_note = payload.get("reasoning")
+                if maybe_note is not None:
+                    meta_note = str(maybe_note).strip() or None
         except Exception:
             pass
 
@@ -33,7 +36,7 @@ def normalize_response(raw: str) -> ResponseSchema:
     if not text:
         raise ValueError("Model returned empty output.")
 
-    return ResponseSchema(ai_response=text, reasoning=reasoning, raw_output=raw or "")
+    return ResponseSchema(ai_response=text, meta_note=meta_note, raw_output=raw or "")
 
 
 def build_generation_prompt(problem: str, examples: Optional[Iterable[Action]] = None) -> str:

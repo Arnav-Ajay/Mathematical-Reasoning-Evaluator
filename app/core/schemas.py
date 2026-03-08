@@ -14,7 +14,7 @@ class Action:
 @dataclass
 class ResponseSchema:
     ai_response: str
-    reasoning: Optional[str] = None
+    meta_note: Optional[str] = None
     raw_output: str = ""
 
 
@@ -36,4 +36,4 @@ class EvaluationResult:
     score: float
     model: str
     error: Optional[str] = None
-    reasoning: Optional[str] = None
+    meta_note: Optional[str] = None

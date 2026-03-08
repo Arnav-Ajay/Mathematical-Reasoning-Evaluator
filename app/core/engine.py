@@ -84,7 +84,7 @@ class OpenAIMathEngine:
                     "correct_answer": action.correct_answer,
                     "model": gen.model,
                     "error": gen.error,
-                    "reasoning": gen.response.reasoning if gen.response else None,
+                    "meta_note": gen.response.meta_note if gen.response else None,
                 }
             )
 
@@ -113,7 +113,7 @@ def dataframe_to_evaluation_results(df: pd.DataFrame) -> List[EvaluationResult]:
                 score=float(row["score"]),
                 model=str(row.get("model", "")),
                 error=row.get("error"),
-                reasoning=row.get("reasoning"),
+                meta_note=row.get("meta_note"),
             )
         )
     return results

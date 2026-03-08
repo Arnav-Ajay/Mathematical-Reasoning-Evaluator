@@ -1,10 +1,11 @@
-# Mathematical Reasoning Evaluator
+# Mathematical Answer Evaluator
 
-Prototype evaluation tool for benchmarking LLM-generated mathematical answers using symbolic equivalence and randomized numeric validation with SymPy.
+Prototype tool for evaluating correctness of LLM-generated mathematical answers using symbolic equivalence and randomized numeric validation with SymPy.
 
-The project provides a small evaluation pipeline that can generate model answers, verify correctness, and produce benchmark metrics across datasets and models.
+The evaluator verifies whether the **final answer produced by a model is mathematically correct**, independent of formatting differences.
 
-It is intended as a lightweight experimentation environment for studying LLM mathematical reasoning performance.
+Reasoning-step evaluation is not included yet.
+Future versions will add reasoning evaluation capabilities.
 
 ## Interface
 
@@ -192,7 +193,7 @@ print(scored[["problem_id", "problem", "ai_response", "correct_answer", "is_corr
 
 ## Limitations
 
-This is an experimental evaluator and currently supports a limited subset of mathematical reasoning tasks.
+This is an experimental evaluator and currently supports a limited subset of mathematical answer-validation tasks.
 
 Known limitations include:
 
