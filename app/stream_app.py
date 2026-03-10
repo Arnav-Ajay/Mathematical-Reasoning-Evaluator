@@ -88,41 +88,6 @@ with st.sidebar:
     st.subheader("Evaluation Parameters")
     samples = st.slider("Partial Scoring Samples", min_value=1, max_value=20, value=DEFAULT_EVAL_SAMPLES)
     tol = st.number_input("Tolerance", min_value=1e-9, max_value=1e-3, value=DEFAULT_EVAL_TOL, format="%.1e")
-    
-    st.subheader("Custom Input")
-    uploaded_file = st.file_uploader(
-        "Upload CSV/Excel (columns: problem, correct_answer)",
-        type=["csv", "xlsx", "xls"],
-        key="global_upload",
-    )
-    
-    # Handle file upload
-    if uploaded_file is not None:
-        upload_token = f"{uploaded_file.name}:{uploaded_file.size}"
-        if st.session_state.last_upload_token != upload_token:
-            try:
-                uploaded_df = _load_uploaded_dataframe(uploaded_file)
-                uploaded_actions, uploaded_issues = dataframe_to_actions(uploaded_df)
-                for issue in uploaded_issues:
-                    st.warning(issue)
-                if uploaded_actions:
-                    st.session_state.raw_rows = actions_to_text(uploaded_actions)
-                    st.success(f"Loaded {len(uploaded_actions)} problem(s) from {uploaded_file.name}.")
-                st.session_state.last_upload_token = upload_token
-            except Exception as e:
-                st.error(f"Failed to parse uploaded file: {e}")
-    
-    if st.button("Load Sample Problems", key="load_samples"):
-        st.session_state.raw_rows = sample_rows_text()
-        st.rerun()
-    
-    st.subheader("Dataset Runner")
-    dataset_name = st.selectbox(
-        "Benchmark Dataset", 
-        options=available_benchmark_datasets(), 
-        index=0,
-        key="global_dataset"
-    )
 
 
 def _render_summary(summary_df: pd.DataFrame) -> None:
@@ -174,6 +139,34 @@ tabs = st.tabs(["Custom Input", "Dataset Runner"])
 with tabs[0]:
     st.subheader("Enter Problems")
     
+    # File upload section
+    st.subheader("Upload Data")
+    uploaded_file = st.file_uploader(
+        "Upload CSV/Excel (columns: problem, correct_answer)",
+        type=["csv", "xlsx", "xls"],
+        key="custom_upload",
+    )
+    
+    # Handle file upload
+    if uploaded_file is not None:
+        upload_token = f"{uploaded_file.name}:{uploaded_file.size}"
+        if st.session_state.last_upload_token != upload_token:
+            try:
+                uploaded_df = _load_uploaded_dataframe(uploaded_file)
+                uploaded_actions, uploaded_issues = dataframe_to_actions(uploaded_df)
+                for issue in uploaded_issues:
+                    st.warning(issue)
+                if uploaded_actions:
+                    st.session_state.raw_rows = actions_to_text(uploaded_actions)
+                    st.success(f"Loaded {len(uploaded_actions)} problem(s) from {uploaded_file.name}.")
+                st.session_state.last_upload_token = upload_token
+            except Exception as e:
+                st.error(f"Failed to parse uploaded file: {e}")
+    
+    if st.button("Load Sample Problems", key="load_samples"):
+        st.session_state.raw_rows = sample_rows_text()
+        st.rerun()
+    
     with st.form("custom_form"):
         raw_rows = st.text_area(
             "Rows (one per line): problem || correct_answer",
@@ -214,6 +207,14 @@ with tabs[0]:
 
 with tabs[1]:
     st.subheader("Run Benchmark Dataset")
+    
+    # Dataset selection
+    dataset_name = st.selectbox(
+        "Benchmark Dataset", 
+        options=available_benchmark_datasets(), 
+        index=0,
+        key="dataset_select"
+    )
     
     if st.button("Run Dataset Benchmark", type="primary"):
         if not selected_models:

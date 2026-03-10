@@ -1,4 +1,5 @@
 # Mathematical Answer Evaluator
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://math-answer-eval.streamlit.app/)
 
 Prototype tool for evaluating correctness of LLM-generated mathematical answers using symbolic equivalence and randomized numeric validation with SymPy.
 
@@ -177,7 +178,10 @@ The app shows a model leaderboard table:
 
 ## Multi-Model Support
 
-The app currently benchmarks multiple OpenAI models in one run.
+The app currently benchmarks multiple OpenAI models in one run:
+- `gpt-4o-mini` (default, fast and cost-effective)
+- `gpt-4o` (more capable for complex problems)
+
 Provider abstraction exists in `app/providers/`, so non-OpenAI providers can be added later.
 
 ## Programmatic Usage

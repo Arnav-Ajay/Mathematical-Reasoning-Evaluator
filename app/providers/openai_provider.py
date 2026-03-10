@@ -71,26 +71,24 @@ class OpenAIProvider(MathProvider):
             return ProviderResponse(model=model, output="", error="OpenAI not available")
 
         try:
-            # Handle o1 models differently - they don't support system messages or temperature
-            if model.startswith("o1"):
-                combined_prompt = f"{system_prompt or OPENAI_SYSTEM_PROMPT}\n\n{prompt}"
-                messages = [{"role": "user", "content": combined_prompt}]
-                kwargs = {"model": model, "messages": messages}
-            else:
-                messages = [
-                    {
-                        "role": "system",
-                        "content": system_prompt or OPENAI_SYSTEM_PROMPT,
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    },
-                ]
-                kwargs = {"model": model, "messages": messages, "temperature": temperature}
+            messages = [
+                {
+                    "role": "system",
+                    "content": system_prompt or OPENAI_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ]
+            kwargs = {"model": model, "messages": messages, "temperature": temperature, "max_tokens": 1000}
             
             resp = self._client.chat.completions.create(**kwargs)
-            content = resp.choices[0].message.content.strip()
+            content = resp.choices[0].message.content
+            if content is None:
+                return ProviderResponse(model=model, output="", error="Model returned empty response")
+            content = content.strip()
+            
             # Strip code fences if the model used them
             if content.startswith("```"):
                 content = content.strip("`").strip()
